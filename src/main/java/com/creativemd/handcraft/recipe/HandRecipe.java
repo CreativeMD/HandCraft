@@ -115,10 +115,14 @@ public class HandRecipe {
 				
 			}
 		}
-		
-		for (int i = 0; i < overflow.size(); i++)
-			if(overflow.get(i).stack.stackSize == 0)
-				overflow.remove(i);
+		int j = 0; 
+		while (j < overflow.size())
+		{
+			if(overflow.get(j).stack.stackSize == 0)
+				overflow.remove(j);
+			else
+				j++;
+		}
 		
 		if(stackSize > 0)
 		{

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.creativemd.creativecore.common.recipe.IRecipeInfo;
+import com.creativemd.creativecore.common.recipe.RecipeLoader;
 import com.creativemd.creativecore.common.utils.stack.StackInfo;
 import com.creativemd.handcraft.recipe.HandRecipe;
 
@@ -37,7 +38,7 @@ public class VanillaImporter extends Importer{
 			
 		}
 		
-		Object[] input = IRecipeInfo.getInput(recipe);
+		Object[] input = RecipeLoader.getInput(recipe);
 		
 		ItemStack output = recipe.getRecipeOutput();
 		if(output != null && output.getItem() != null && output.getItem().getUnlocalizedName().contains("ic2.itemToolPainter") && input.length == 1)

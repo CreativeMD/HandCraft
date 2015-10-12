@@ -1,0 +1,22 @@
+{
+	"finishstep":{
+		"sounds":
+			[
+				{
+					"name":"crafting/finishstep",
+					"stream":false
+				}
+			],
+			"category":"player"
+	},
+	"finishchain":{
+		"sounds":
+			[
+				{
+					"name":"crafting/finishchain",
+					"stream":false
+				}
+			],
+			"category":"player"
+	}        
+}

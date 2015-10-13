@@ -40,10 +40,14 @@ public class HandCraft {
 	@EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-		
+		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+		config.load();
+		maxLevelPerInfo = config.get("handrecipe", "depthlimit", 10, "").getInt();
+		config.save();
     }
 	
 	public static final String guiID = "HC";
+	public static int maxLevelPerInfo = 10;
 	
 	@SideOnly(Side.CLIENT)
 	public static void initClient()

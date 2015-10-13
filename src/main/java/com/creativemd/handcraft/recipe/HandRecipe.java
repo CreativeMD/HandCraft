@@ -16,6 +16,8 @@ import scala.collection.immutable.Stream.Cons;
 
 public class HandRecipe {
 	
+	public static final int maxInput = 10;
+	
 	public StackInfo[] input;
 	
 	public ItemStack output;
@@ -40,12 +42,12 @@ public class HandRecipe {
 		
 		ArrayList<RecipeOverflow> overflow = new ArrayList<RecipeOverflow>();
 		int ammount = 0;
-		ConsumeResult result = consumeRecipe(basic, input, overflow);
+		ConsumeResult result = consumeRecipe(basic, input, overflow, new SearchLimiter());
 		while(result != null)
 		{
 			overflow.addAll(result.overflow);
 			ammount++;
-			result = consumeRecipe(basic, input, overflow);
+			result = consumeRecipe(basic, input, overflow, new SearchLimiter());
 			searched.clear();
 		}
 		
@@ -66,7 +68,7 @@ public class HandRecipe {
 		
 		for (int i = 0; i < processCount; i++) 
 		{
-			ConsumeResult temp = consumeRecipe(inventory, input, result.overflow);
+			ConsumeResult temp = consumeRecipe(inventory, input, result.overflow, new SearchLimiter());
 			if(temp == null)
 			{
 				searched.clear();
@@ -85,11 +87,11 @@ public class HandRecipe {
 		return result;
 	}
 	
-	public ConsumeResult consumeRecipe(IInventory inventory, StackInfo[] infos, ArrayList<RecipeOverflow> overflow)
+	public ConsumeResult consumeRecipe(IInventory inventory, StackInfo[] infos, ArrayList<RecipeOverflow> overflow, SearchLimiter limiter)
 	{
 		ConsumeResult result = new ConsumeResult();
 		for (int i = 0; i < infos.length; i++) {
-			ConsumeResult temp = consumeStackInfo(inventory, infos[i], overflow);
+			ConsumeResult temp = consumeStackInfo(inventory, infos[i], overflow, limiter);
 			if(temp == null)
 				return null;
 			result.addResult(temp);
@@ -99,7 +101,7 @@ public class HandRecipe {
 	
 	public static ArrayList<HandRecipe> searched = new ArrayList<HandRecipe>();
 	
-	public ConsumeResult consumeStackInfo(IInventory inventory, StackInfo info, ArrayList<RecipeOverflow> overflow)
+	public ConsumeResult consumeStackInfo(IInventory inventory, StackInfo info, ArrayList<RecipeOverflow> overflow, SearchLimiter limiter)
 	{
 		ConsumeResult result = new ConsumeResult();
 		ArrayList<ItemStack> consumed = new ArrayList<ItemStack>();
@@ -132,7 +134,7 @@ public class HandRecipe {
 			result.stacks.addAll(consumed);
 		}
 		
-		if(stackSize > 0)
+		if(stackSize > 0 && limiter.canGoToNextLevel())
 		{
 			ArrayList<HandRecipe> searchedInside = new ArrayList<HandRecipe>();
 			for (int i = 0; i < HandCraft.recipes.size(); i++) {
@@ -145,16 +147,20 @@ public class HandRecipe {
 					searched.add(recipe);
 					searchedInside.add(recipe);
 					
+					limiter.goToNextLevel();
+					
 					//ArrayList<ConsumeResult> newResult = new ArrayList<ConsumeResult>();
-					ConsumeResult tempResult = consumeRecipe(inventory, recipe.input, overflow);
+					ConsumeResult tempResult = consumeRecipe(inventory, recipe.input, overflow, limiter);
 					while(tempResult != null && ammount < needed)
 					{
 						result.addRecipe(recipe);
 						result.addResult(tempResult);
 						ammount++;
 						if(ammount < needed)
-							tempResult = consumeRecipe(inventory, recipe.input, overflow);
+							tempResult = consumeRecipe(inventory, recipe.input, overflow, limiter);
 					}
+					
+					limiter.goToPreviousLevel();
 					
 					int crafted = ammount*recipe.output.stackSize;
 					ItemStack recipeOutput = recipe.output.copy();
@@ -198,6 +204,32 @@ public class HandRecipe {
 				return false;
 		}
 		return true;
+	}
+	
+	public static class SearchLimiter {
+		
+		public SearchLimiter()
+		{
+			index = 0;
+		}
+		
+		public int index;
+		
+		public void goToNextLevel()
+		{
+			index++;
+		}
+		
+		public void goToPreviousLevel()
+		{
+			index--;
+		}
+		
+		public boolean canGoToNextLevel()
+		{
+			return index < HandCraft.maxLevelPerInfo;
+		}
+		
 	}
 	
 	public static class ConsumeResult {

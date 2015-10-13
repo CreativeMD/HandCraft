@@ -40,9 +40,9 @@ public class VanillaImporter extends Importer{
 		
 		Object[] input = RecipeLoader.getInput(recipe);
 		
-		ItemStack output = recipe.getRecipeOutput();
-		if(output != null && output.getItem() != null && output.getItem().getUnlocalizedName().contains("ic2.itemToolPainter") && input.length == 1)
-			return null;
+		//ItemStack output = recipe.getRecipeOutput();
+		//if(output != null && output.getItem() != null && output.getItem().getUnlocalizedName().contains("ic2.itemToolPainter") && input.length == 1)
+			//return null;
 		
 		return input;
 	}

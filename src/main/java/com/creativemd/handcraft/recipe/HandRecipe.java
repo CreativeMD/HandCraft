@@ -6,12 +6,14 @@ import java.util.Arrays;
 import com.creativemd.creativecore.common.recipe.Recipe;
 import com.creativemd.creativecore.common.utils.InventoryUtils;
 import com.creativemd.creativecore.common.utils.stack.StackInfo;
+import com.creativemd.creativecore.common.utils.string.StringUtils;
 import com.creativemd.handcraft.HandCraft;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import scala.collection.immutable.Stream.Cons;
 
 public class HandRecipe {
@@ -29,6 +31,44 @@ public class HandRecipe {
 		this.input = input;
 		this.output = output;
 		this.time = time;
+	}
+	
+	public static HandRecipe readFromNBT(NBTTagCompound nbt)
+	{
+		int count = nbt.getInteger("iCount");
+		StackInfo[] infos = new StackInfo[count];
+		for (int i = 0; i < infos.length; i++) {
+			Object[] objects = StringUtils.StringToObjects(nbt.getString(i + "i"));
+			StackInfo info = null;
+			if(objects.length == 2 && objects[0] instanceof String && objects[1] instanceof Integer)
+			{
+				info = StackInfo.parseString((String) objects[0]);
+				if(info != null)
+					info.stackSize = (Integer)objects[1];
+			}
+			if(info == null)
+				return null;
+			infos[i] = info;
+		}
+		ItemStack output = ItemStack.loadItemStackFromNBT(nbt);
+		
+		for (int i = 0; i < HandCraft.recipes.size(); i++) {
+			HandRecipe recipe = HandCraft.recipes.get(i);
+			if(isEqual(infos, recipe.input) && InventoryUtils.isItemStackEqual(output, recipe.output))
+				return recipe;
+		}
+		return null;
+	}
+	
+	public NBTTagCompound writeToNBT()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setInteger("iCount", input.length);
+		for (int i = 0; i < input.length; i++) {
+			nbt.setString(i + "i", StringUtils.ObjectsToString(input[i].toString(), input[i].stackSize));
+		}
+		output.writeToNBT(nbt);
+		return nbt;
 	}
 	
 	public int countPossibleRecipes(IInventory inventory)

@@ -43,11 +43,13 @@ public class HandCraft {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		maxLevelPerInfo = config.get("handrecipe", "depthlimit", 10, "").getInt();
+		vanillaOnly = config.get("handrecipe", "vanillaOnly", false).getBoolean();
 		config.save();
     }
 	
 	public static final String guiID = "HC";
 	public static int maxLevelPerInfo = 10;
+	public static boolean vanillaOnly = false;
 	
 	@SideOnly(Side.CLIENT)
 	public static void initClient()

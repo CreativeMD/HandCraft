@@ -8,6 +8,7 @@ import java.util.List;
 import com.creativemd.creativecore.common.recipe.IRecipeInfo;
 import com.creativemd.creativecore.common.recipe.RecipeLoader;
 import com.creativemd.creativecore.common.utils.stack.StackInfo;
+import com.creativemd.handcraft.HandCraft;
 import com.creativemd.handcraft.recipe.HandRecipe;
 
 import net.minecraft.item.Item;
@@ -38,7 +39,7 @@ public class VanillaImporter extends Importer{
 			
 		}
 		
-		Object[] input = RecipeLoader.getInput(recipe);
+		Object[] input = RecipeLoader.getInput(recipe, HandCraft.vanillaOnly);
 		
 		//ItemStack output = recipe.getRecipeOutput();
 		//if(output != null && output.getItem() != null && output.getItem().getUnlocalizedName().contains("ic2.itemToolPainter") && input.length == 1)
